@@ -5,8 +5,14 @@ import TimerControls from "./TimerControls";
 const Timer = () => {
   const timerRef = useRef(null);
 
+  const [hoursInput, setHoursInput] = useState(0);
+  const [minutesInput, setMinutesInput] = useState(10);
+  const [secondsInput, setSecondsInput] = useState(0);
+
+  const duration = hoursInput * 3600 + minutesInput * 60 + secondsInput;
+
   //duration = the target time in seconds
-  const [duration, setDuration] = useState(600);
+  // const [duration, setDuration] = useState(600);
 
   //timeleft = whats currently counting down
   const [timeLeft, setTimeLeft] = useState(duration);
@@ -44,8 +50,41 @@ const Timer = () => {
   }, []);
 
   return (
-    <div>
+    <div className="flex flex-col items-center gap-4">
       <TimerDisplay time={timeLeft} />
+
+      <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-slate-700">
+        <label className="flex items-center gap-1">
+          <input
+            type="number"
+            value={hoursInput}
+            onChange={(e) => setHoursInput(Number(e.target.value))}
+            className="w-16 rounded border border-slate-300 px-2 py-1 text-center"
+          />
+          <span>h</span>
+        </label>
+
+        <label className="flex items-center gap-1">
+          <input
+            type="number"
+            value={minutesInput}
+            onChange={(e) => setMinutesInput(Number(e.target.value))}
+            className="w-16 rounded border border-slate-300 px-2 py-1 text-center"
+          />
+          <span>m</span>
+        </label>
+
+        <label className="flex items-center gap-1">
+          <input
+            type="number"
+            value={secondsInput}
+            onChange={(e) => setSecondsInput(Number(e.target.value))}
+            className="w-16 rounded border border-slate-300 px-2 py-1 text-center"
+          />
+          <span>s</span>
+        </label>
+      </div>
+
       <TimerControls
         isRunning={isRunning}
         onToggle={toggleTimer}
