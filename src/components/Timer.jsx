@@ -5,42 +5,47 @@ import TimerControls from "./TimerControls";
 const Timer = () => {
   const timerRef = useRef(null);
 
-  const [time, setTime] = useState(() => {
-    return Number(localStorage.getItem("time") || 0);
-  });
+  //duration = the target time in seconds
+  const [duration, setDuration] = useState(600);
 
+  //timeleft = whats currently counting down
+  const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem("time", time);
-  }, [time]);
 
   const toggleTimer = () => {
     if (isRunning) {
-      //clear interval to stop the timer
       clearInterval(timerRef.current);
       timerRef.current = null;
     } else {
-      //start timer
       timerRef.current = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setIsRunning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
     }
-
     setIsRunning(!isRunning);
   };
 
   const resetTimer = () => {
     clearInterval(timerRef.current);
     setIsRunning(false);
-    setTime(0);
+    setTimeLeft(duration);
     timerRef.current = null;
-    localStorage.removeItem("time");
   };
+
+  //cleanup: stop the interval if the component ever unmounts mid-countdown
+  useEffect(() => {
+    return () => clearInterval(timerRef.current);
+  }, []);
 
   return (
     <div>
-      <TimerDisplay time={time} />
+      <TimerDisplay time={timeLeft} />
       <TimerControls
         isRunning={isRunning}
         onToggle={toggleTimer}
