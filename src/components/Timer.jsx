@@ -11,12 +11,20 @@ const Timer = () => {
 
   const duration = hoursInput * 3600 + minutesInput * 60 + secondsInput;
 
-  //duration = the target time in seconds
-  // const [duration, setDuration] = useState(600);
-
   //timeleft = whats currently counting down
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(false);
+
+  useEffect(() => {
+    if (!isRunning) {
+      setTimeLeft(duration);
+    }
+  }, [duration]);
+
+  //cleanup: stop the interval if the component ever unmounts mid-countdown
+  useEffect(() => {
+    return () => clearInterval(timerRef.current);
+  }, []);
 
   const toggleTimer = () => {
     if (isRunning) {
@@ -43,11 +51,6 @@ const Timer = () => {
     setTimeLeft(duration);
     timerRef.current = null;
   };
-
-  //cleanup: stop the interval if the component ever unmounts mid-countdown
-  useEffect(() => {
-    return () => clearInterval(timerRef.current);
-  }, []);
 
   return (
     <div className="flex flex-col items-center gap-4">
