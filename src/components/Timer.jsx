@@ -14,6 +14,7 @@ const Timer = () => {
   //timeleft = whats currently counting down
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
 
   useEffect(() => {
     if (!isRunning) {
@@ -31,6 +32,7 @@ const Timer = () => {
       clearInterval(timerRef.current);
       timerRef.current = null;
     } else {
+      setHasStarted(true);
       timerRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -48,51 +50,70 @@ const Timer = () => {
   const resetTimer = () => {
     clearInterval(timerRef.current);
     setIsRunning(false);
+    setHasStarted(false);
     setTimeLeft(duration);
     timerRef.current = null;
   };
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <TimerDisplay time={timeLeft} />
-
-      <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-slate-700">
-        <label className="flex items-center gap-1">
-          <input
-            type="number"
-            value={hoursInput}
-            onChange={(e) => setHoursInput(Number(e.target.value))}
-            className="w-16 rounded border border-slate-300 px-2 py-1 text-center"
+      {hasStarted ? (
+        <>
+          <TimerDisplay time={timeLeft} />
+          <TimerControls
+            isRunning={isRunning}
+            onToggle={toggleTimer}
+            onReset={resetTimer}
           />
-          <span>h</span>
-        </label>
+        </>
+      ) : (
+        <div className="flex flex-col items-center gap-6 mih-h-screen">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-white">
+            <label className="flex items-center gap-1">
+              <input
+                type="number"
+                value={hoursInput}
+                onChange={(e) => setHoursInput(Number(e.target.value))}
+                className="w-20 bg-transparent text-5xl font-light text-center outline-none"
+              />
+              <span className="text-5xl font-light text-slate-500">:</span>
+            </label>
 
-        <label className="flex items-center gap-1">
-          <input
-            type="number"
-            value={minutesInput}
-            onChange={(e) => setMinutesInput(Number(e.target.value))}
-            className="w-16 rounded border border-slate-300 px-2 py-1 text-center"
-          />
-          <span>m</span>
-        </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="number"
+                value={minutesInput}
+                onChange={(e) => setMinutesInput(Number(e.target.value))}
+                className="w-20 bg-transparent text-5xl font-light text-center outline-none"
+              />
+              <span className="text-5xl font-light text-slate-500">:</span>
+            </label>
 
-        <label className="flex items-center gap-1">
-          <input
-            type="number"
-            value={secondsInput}
-            onChange={(e) => setSecondsInput(Number(e.target.value))}
-            className="w-16 rounded border border-slate-300 px-2 py-1 text-center"
-          />
-          <span>s</span>
-        </label>
-      </div>
-
-      <TimerControls
-        isRunning={isRunning}
-        onToggle={toggleTimer}
-        onReset={resetTimer}
-      />
+            <label className="flex items-center gap-1">
+              <input
+                type="number"
+                value={secondsInput}
+                onChange={(e) => setSecondsInput(Number(e.target.value))}
+                className="w-20 bg-transparent text-5xl font-light text-center outline-none"
+              />
+              <span className="text-5xl font-light text-slate-500"></span>
+            </label>
+          </div>
+          <button
+            onClick={toggleTimer}
+            className="mt-50 w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors flex items-center justify-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="white"
+              className="w-10 h-10 ml-1"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
