@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import TimerDisplay from "./TimerDisplay";
 import TimerControls from "./TimerControls";
+import TimerRing from "./TimerRing";
 
 const Timer = () => {
   const timerRef = useRef(null);
@@ -56,18 +57,23 @@ const Timer = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <>
       {hasStarted ? (
-        <>
-          <TimerDisplay time={timeLeft} />
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative flex items-center justify-center">
+            <TimerRing timeLeft={timeLeft} duration={duration} />
+            <div className="absolute">
+              <TimerDisplay time={timeLeft} />
+            </div>
+          </div>
           <TimerControls
             isRunning={isRunning}
             onToggle={toggleTimer}
             onReset={resetTimer}
           />
-        </>
+        </div>
       ) : (
-        <div className="flex flex-col items-center gap-6 mih-h-screen">
+        <div className="flex flex-col items-center gap-6 min-h-screen">
           <div className="flex flex-wrap items-center justify-center gap-2 text-white">
             <label className="flex items-center gap-1">
               <input
@@ -114,7 +120,7 @@ const Timer = () => {
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
