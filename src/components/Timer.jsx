@@ -17,6 +17,22 @@ const Timer = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
 
+  const [presents, setPresents] = useState(() => {
+    const saved = localStorage.getItem("presents");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const addPresent = (label) => {
+    const newPresent = {
+      id: Date.now(),
+      label,
+      duration,
+    };
+    setPresents((prev) => [...prev, newPresent]);
+  };
+
+  const [labelInput, setLabelInput] = useState("");
+
   useEffect(() => {
     if (!isRunning) {
       setTimeLeft(duration);
@@ -27,6 +43,10 @@ const Timer = () => {
   useEffect(() => {
     return () => clearInterval(timerRef.current);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("presents", JSON.stringify(presents));
+  }, [presents]);
 
   const toggleTimer = () => {
     if (isRunning) {
@@ -105,6 +125,53 @@ const Timer = () => {
               <span className="text-5xl font-light text-slate-500"></span>
             </label>
           </div>
+
+          <div className="flex items-center gap-2 mt-4">
+            <input
+              type="text"
+              value={labelInput}
+              onChange={(e) => setLabelInput(e.target.value)}
+              placeholder="Timer name"
+              className="bg-slate-800 text-white px-3 py-2 rounded outline-none"
+            />
+
+            <button
+              onClick={() => {
+                if (labelInput.trim() === "") return;
+                addPresent(labelInput);
+                setLabelInput("");
+              }}
+              className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded"
+            >
+              Save
+            </button>
+          </div>
+
+          <div className="w-full mt-6 flex flex-col gap-2">
+            {presents.map((present) => (
+              <button
+                key={present.id}
+                onClick={() => {
+                  setHoursInput(Math.floor(present.duration / 3600));
+                  setMinutesInput(Math.floor((present.duration % 3600) / 60));
+                  setSecondsInput(present.duration % 60);
+                }}
+                className="flex justify-between items-center bg-slate-700 hover:bg-slate-700 text-white px-4 py-3 rounded"
+              >
+                <span>{present.label}</span>
+                <span className="text-slate-400">
+                  {String(Math.floor(present.duration / 3600)).padStart(2, "0")}
+                  :{" "}
+                  {String(Math.floor((present.duration % 3600) / 60)).padStart(
+                    2,
+                    "0",
+                  )}{" "}
+                  : {String(present.duration % 60).padStart(2, "0")}
+                </span>
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={toggleTimer}
             className="mt-50 w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors flex items-center justify-center"
