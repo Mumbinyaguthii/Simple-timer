@@ -33,6 +33,10 @@ const Timer = () => {
 
   const [labelInput, setLabelInput] = useState("");
 
+  const deletePresent = (id) => {
+    setPresents((prev) => prev.filter((present) => present.id !== id));
+  };
+
   useEffect(() => {
     if (!isRunning) {
       setTimeLeft(duration);
@@ -122,7 +126,6 @@ const Timer = () => {
                 onChange={(e) => setSecondsInput(Number(e.target.value))}
                 className="w-20 bg-transparent text-5xl font-light text-center outline-none"
               />
-              <span className="text-5xl font-light text-slate-500"></span>
             </label>
           </div>
 
@@ -138,6 +141,15 @@ const Timer = () => {
             <button
               onClick={() => {
                 if (labelInput.trim() === "") return;
+                const nameExists = presents.some(
+                  (present) =>
+                    present.label.toLowerCase() ===
+                    labelInput.trim().toLowerCase(),
+                );
+                if (nameExists) {
+                  alert("A timer with that name already exists.");
+                  return;
+                }
                 addPresent(labelInput);
                 setLabelInput("");
               }}
@@ -148,33 +160,54 @@ const Timer = () => {
           </div>
 
           <div className="w-full mt-6 flex flex-col gap-2">
-            {presents.map((present) => (
-              <button
-                key={present.id}
-                onClick={() => {
-                  setHoursInput(Math.floor(present.duration / 3600));
-                  setMinutesInput(Math.floor((present.duration % 3600) / 60));
-                  setSecondsInput(present.duration % 60);
-                }}
-                className="flex justify-between items-center bg-slate-700 hover:bg-slate-700 text-white px-4 py-3 rounded"
-              >
-                <span>{present.label}</span>
-                <span className="text-slate-400">
-                  {String(Math.floor(present.duration / 3600)).padStart(2, "0")}
-                  :{" "}
-                  {String(Math.floor((present.duration % 3600) / 60)).padStart(
-                    2,
-                    "0",
-                  )}{" "}
-                  : {String(present.duration % 60).padStart(2, "0")}
-                </span>
-              </button>
-            ))}
+            {presents.length === 0 ? (
+              <p className="text-slate-500 text-sm text-center">
+                No saved timers yet
+              </p>
+            ) : (
+              presents.map((present) => (
+                <div
+                  key={present.id}
+                  className="flex items-center gap-2 w-full"
+                >
+                  <button
+                    onClick={() => {
+                      setHoursInput(Math.floor(present.duration / 3600));
+                      setMinutesInput(
+                        Math.floor((present.duration % 3600) / 60),
+                      );
+                      setSecondsInput(present.duration % 60);
+                    }}
+                    className="flex-1 flex justify-between items-center bg-slate-700 hover:bg-slate-700 text-white px-4 py-3 rounded"
+                  >
+                    <span>{present.label}</span>
+                    <span className="text-slate-400">
+                      {String(Math.floor(present.duration / 3600)).padStart(
+                        2,
+                        "0",
+                      )}
+                      :{" "}
+                      {String(
+                        Math.floor((present.duration % 3600) / 60),
+                      ).padStart(2, "0")}{" "}
+                      : {String(present.duration % 60).padStart(2, "0")}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => deletePresent(present.id)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-red-500 hover:text-white transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            )}
           </div>
 
           <button
             onClick={toggleTimer}
-            className="mt-50 w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors flex items-center justify-center"
+            className="mt-10 w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors flex items-center justify-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
